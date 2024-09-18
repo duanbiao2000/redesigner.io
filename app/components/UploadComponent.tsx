@@ -113,26 +113,45 @@ export default function UploadComponent() {
 		[roomType, roomTheme, buildingType, buildingTheme],
 	)
 
-	const downloadPredictedImg = useCallback(
-		async (url: string) => {
-			if (
-				!url ||
-				!imageName ||
-				(!roomType && !buildingType) ||
-				(!roomTheme && !buildingTheme)
-			)
-				throw new Error('No predicted image found. Try Again!')
-			setDownloading(true)
-			const fileName = appendTextToName(
-				imageName,
-				(roomType ?? buildingType) as string,
-				(roomTheme ?? buildingTheme) as string,
-			)
-			await downloadImg(url, fileName)
-			setDownloading(false)
-		},
-		[roomType, roomTheme, buildingType, buildingTheme, imageName],
-	)
+	// 使用useCallback钩子定义一个异步函数downloadPredictedImg，用于下载预测的图像
+// 该函数接受一个URL参数，用于指定要下载的图像位置
+// 参数：
+// - url: 字符串类型，表示图像的URL
+// 返回值：无
+// 该函数依赖于roomType, roomTheme, buildingType, buildingTheme, imageName这些变量
+const downloadPredictedImg = useCallback(
+	async (url: string) => {
+		// 检查URL、imageName以及roomType或buildingType、roomTheme或buildingTheme是否有效
+		// 如果有任何一个条件不满足，抛出错误，提示没有找到预测图像，需要重新尝试
+		if (
+			!url ||
+			!imageName ||
+			(!roomType && !buildingType) ||
+			(!roomTheme && !buildingTheme)
+		)
+			throw new Error('No predicted image found. Try Again!')
+		
+		// 设置downloading状态为true，表示图像下载过程开始
+		setDownloading(true)
+		
+		// 生成文件名，通过在imageName基础上添加roomType或buildingType以及roomTheme或buildingTheme
+		// 作为字符串进行拼接
+		const fileName = appendTextToName(
+			imageName,
+			// 选择roomType和buildingType中非空值作为字符串返回
+			(roomType ?? buildingType) as string,
+			(roomTheme ?? buildingTheme) as string,
+		)
+		
+		// 调用downloadImg函数下载图像，传入URL和文件名
+		await downloadImg(url, fileName)
+		
+		// 下载完成后，设置downloading状态为false，表示下载过程结束
+		setDownloading(false)
+	},
+	// useCallback依赖列表，当这些变量改变时，会创建新的函数
+	[roomType, roomTheme, buildingType, buildingTheme, imageName],
+)
 
 	const resetFields = () => {
 		setImageUrl('')
